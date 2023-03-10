@@ -7,6 +7,8 @@ from torchvision.transforms import Compose
 from ddpm_pytorch.forward_diffusion import *
 from tqdm.auto import tqdm
 
+import matplotlib.pyplot as plt
+
 
 # load dataset from the hub
 dataset = load_dataset("fashion_mnist")
@@ -29,7 +31,8 @@ def transformation(examples):
 
     return examples
 
-transformed_dataset = dataset.with_transform(transformation).remove_columns("label")
+transformed_dataset = dataset.with_transform(transformation).remove_columns("label") # label 데이터를 날려버림
+# dataset.shape == {'train': (60000, 2), 'test': (10000, 2)} 에서, transformed_dataset.shape == {'train': (60000, 1), 'test': (10000, 1)}
 
 # create dataloader
 dataloader = DataLoader(transformed_dataset["train"], batch_size=batch_size, shuffle=True)
@@ -54,7 +57,7 @@ def p_sample(model, x, t, t_index):
         posterior_variance_t = extract(posterior_variance, t, x.shape)
         noise = torch.randn_like(x)
         # Algorithm 2 line 4:
-        return model_mean + torch.sqrt(posterior_variance_t) * noise 
+        return model_mean + torch.sqrt(posterior_variance_t) * noise
 
 # Algorithm 2 (including returning all images)
 @torch.no_grad()
@@ -63,7 +66,7 @@ def p_sample_loop(model, shape):
 
     b = shape[0]
     # start from pure noise (for each example in the batch)
-    img = torch.randn(shape, device=device)
+    img = torch.randn(shape, device=device) # randn : pure gausian noise
     imgs = []
 
     for i in tqdm(reversed(range(0, timesteps)), desc='sampling loop time step', total=timesteps):

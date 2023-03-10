@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 from ddpm_pytorch.network import *
 from ddpm_pytorch.forward_diffusion import *
-from ddpm_pytorch.reversed_diffusion import *
+from ddpm_pytorch.training import *
 from torchvision.utils import save_image
 
 def num_to_groups(num, divisor):
@@ -30,10 +30,12 @@ model.to(device)
 
 optimizer = Adam(model.parameters(), lr=1e-3)
 
-epochs = 10
+epochs = 5
 
 for epoch in range(epochs):
+    print("epoch", epoch,":")
     for step, batch in enumerate(dataloader):
+        # each batches are dictionaries with 1 key('pixel_values')
         optimizer.zero_grad()
 
         batch_size = batch["pixel_values"].shape[0]
@@ -44,7 +46,6 @@ for epoch in range(epochs):
 
         loss = p_losses(model, batch, t, loss_type="huber")
 
-        print(step)
         if step % 100 == 0:
             print("Loss:", loss.item())
 
@@ -52,7 +53,7 @@ for epoch in range(epochs):
         optimizer.step()
 
         # save generated images
-        # 작동 안됨, 이유 모르겠음 ㅅㅂ
+        # 작동 안됨
         # if step % save_and_sample_every == 0: # step != 0 and
         #     milestone = step // save_and_sample_every
         #     batches = num_to_groups(4, batch_size)
@@ -63,5 +64,30 @@ for epoch in range(epochs):
 
 samples = sample(model, image_size=image_size, batch_size=64, channels=channels)
 random_index = 5
-plt.imshow(samples[-1][random_index].reshape(image_size, image_size, channels), cmap="gray")
+plt.subplot(331)
+plt.imshow(samples[-1][0].reshape(image_size, image_size, channels), cmap="gray")
+
+plt.subplot(332)
+plt.imshow(samples[-1][10].reshape(image_size, image_size, channels), cmap="gray")
+
+plt.subplot(333)
+plt.imshow(samples[-1][20].reshape(image_size, image_size, channels), cmap="gray")
+
+plt.subplot(334)
+plt.imshow(samples[-1][30].reshape(image_size, image_size, channels), cmap="gray")
+
+plt.subplot(335)
+plt.imshow(samples[-1][40].reshape(image_size, image_size, channels), cmap="gray")
+
+plt.subplot(336)
+plt.imshow(samples[-1][50].reshape(image_size, image_size, channels), cmap="gray")
+
+plt.subplot(337)
+plt.imshow(samples[-1][60].reshape(image_size, image_size, channels), cmap="gray")
+
+plt.subplot(338)
+plt.imshow(samples[-1][55].reshape(image_size, image_size, channels), cmap="gray")
+
+plt.subplot(339)
+plt.imshow(samples[-1][44].reshape(image_size, image_size, channels), cmap="gray")
 plt.show()
